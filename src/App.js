@@ -63,8 +63,12 @@ const App = defineComponent({
     attached() {
         // ref element
         this.svgEl = this.el.querySelector('svg');
-        d3select(this.svgEl).on('mousemove', this.onMouseMove.bind(this));
+
+        // d3select(this.svgEl).on('mousemove', this.onMouseMove.bind(this));
+
+
         this.next();
+
     },
 
     next() {
@@ -73,7 +77,7 @@ const App = defineComponent({
         let realMax = this.data.get('realMax');
 
         if (currentMax < realMax) {
-            console.log(currentMax, realMax)
+            // console.log(currentMax, realMax)
             this.data.set('currentMax', currentMax + 1);
             setTimeout(this.next.bind(this), 500);
         }

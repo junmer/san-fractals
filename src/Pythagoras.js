@@ -41,9 +41,6 @@ const memoizedCalc = function () {
 var Pythagoras = defineComponent({
 
     initData: function() {
-
-        console.log('initData');
-
         return {
             left: 0,
             right: 0
@@ -51,56 +48,76 @@ var Pythagoras = defineComponent({
     },
 
     template: `
-        <g transform="translate({{x}} {{y}}) {{0 | rotate(w, x, y, heightFactor, lean, left, right) }}">
+        <g transform="{{ gTransform }}" >
             <rect
                 width="{{ w }}" height="{{ w }}"
                 x="0" y="0"
-                style="fill: {{ lvl / maxlvl | interpolateViridis }}" />
+                style="{{ rectStyle }}" />
 
             <pythagoras
-                san-if="lvl < maxlvl && w > 1"
-                w="{{ 'nextLeft' | calc(w, x, y, heightFactor, lean) }}"
+                san-if="{{ hasNext }}"
+                w="{{ nextLeft }}"
                 x="{{ 0 }}"
-                y="{{ 'nextLeft' | calc(w, x, y, heightFactor, lean) | minuend }}"
-                lvl="{{ lvl + 1 }}" maxlvl="{{ maxlvl }}"
+                y="{{ 0 - nextLeft }}"
+                lvl="{{ lvl + 1 }}"
+                maxlvl="{{ maxlvl }}"
                 heightFactor="{{ heightFactor }}"
                 lean="{{ lean }}"
                 left="{{ 1 }}" />
 
             <pythagoras
-                san-if="lvl < maxlvl && w > 1"
-                w="{{ 'nextRight' | calc(w, x, y, heightFactor, lean) }}"
-                x="{{ 'nextRight' | calc(w, x, y, heightFactor, lean) | minuend(w) }}"
-                y="{{ 'nextRight' | calc(w, x, y, heightFactor, lean) | minuend }}"
-                lvl="{{ lvl + 1 }}" maxlvl="{{ maxlvl }}"
+                san-if="{{ hasNext }}"
+                w="{{ nextRight }}"
+                x="{{ w - nextRight }}"
+                y="{{ 0 - nextRight }}"
+                lvl="{{ lvl + 1 }}"
+                maxlvl="{{ maxlvl }}"
                 heightFactor="{{ heightFactor }}"
                 lean="{{ lean }}"
                 right="{{ 1 }}" />
+
         </g>
     `,
 
+    computed: {
 
-    filters: {
-
-        minuend: function(subtractor, target) {
-            return (target || 0) - subtractor;
+        rectStyle: function() {
+            return 'fill:' + interpolateViridis(this.data.get('lvl') / this.data.get('maxlvl'));
         },
 
-        calc: function(key, w, x, y, heightFactor, lean) {
+        nextRight: function() {
 
             var ret = memoizedCalc({
-                w: w,
-                heightFactor: heightFactor,
-                lean: lean
-            })[key];
+                w: this.data.get('w'),
+                heightFactor: this.data.get('heightFactor'),
+                lean: this.data.get('lean')
+            });
 
-            console.log(key, ret)
-
-            return ret;
-
+            return ret.nextRight;
         },
 
-        rotate: function(placeholder, w, x, y, heightFactor, lean, left, right) {
+        nextLeft: function() {
+
+            var ret = memoizedCalc({
+                w: this.data.get('w'),
+                heightFactor: this.data.get('heightFactor'),
+                lean: this.data.get('lean')
+            });
+
+            return ret.nextLeft;
+        },
+
+        hasNext: function() {
+            return this.data.get('lvl') < this.data.get('maxlvl') && this.data.get('w') > 2;
+        },
+
+        gTransform: function() {
+
+            let w = this.data.get('w');
+            let x = this.data.get('x');
+            let y = this.data.get('y');
+            let heightFactor = this.data.get('heightFactor');
+            let lean = this.data.get('lean');
 
             const { nextRight, nextLeft, A, B } = memoizedCalc({
                 w: w,
@@ -110,23 +127,22 @@ var Pythagoras = defineComponent({
 
             let rotate = '';
 
-            if (left) {
+            if (this.data.get('left')) {
                 rotate = `rotate(${-A} 0 ${w})`;
             }
-            else if (right) {
+            else if (this.data.get('right')) {
                 rotate = `rotate(${B} ${w} ${w})`;
             }
 
-            return rotate;
+            console.log(`translate(${x} ${y}) ${rotate}`)
 
-        },
-        interpolateViridis: interpolateViridis
+            return `translate(${x} ${y}) ${rotate}`;
+
+        }
     },
 
     attached() {
-
-        // console.log(this);
-
+        console.log(this.data.data)
     }
 
 });

@@ -10,7 +10,6 @@ var server = new WebpackDevServer(compiler, {
     },
     headers: { 'access-control-allow-origin': '*' },
 });
-
-server.listen(8081, '127.0.0.1', function() {
-    console.log('Starting server on http://localhost:8081');
+server.listen(8089, '127.0.0.1', function() {
+    console.log('Starting server on http://localhost:8089');
 });

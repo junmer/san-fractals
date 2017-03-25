@@ -36,12 +36,12 @@ const App = defineComponent({
 
                     <pythagoras w="{{baseW}}"
                                 h="{{baseW}}"
-                                heightFactor="{{heightFactor}}"
-                                lean="{{lean}}"
-                                x="{{svg.width / 2 - 40}}"
+                                seed="{{seed}}"
+                                x="{{(svg.width - baseW) / 2}}"
                                 y="{{svg.height - baseW}}"
                                 lvl="{{0}}"
-                                maxlvl="{{currentMax}}" />
+                                maxlvl="{{currentMax}}" >
+                    </pythagoras>
 
                 </svg>
             </p>
@@ -52,20 +52,22 @@ const App = defineComponent({
         return {
             logo: logo,
             svg: this.svg,
-            realMax: 11,
-            currentMax: 0,
+            realMax: 10,
+            currentMax: 1,
             baseW: 80,
-            heightFactor: 0,
-            lean: 0
+            seed: {
+                heightFactor: 0,
+                lean: 0,
+            }
         }
     },
 
     attached() {
+
         // ref element
         this.svgEl = this.el.querySelector('svg');
 
-        // d3select(this.svgEl).on('mousemove', this.onMouseMove.bind(this));
-
+        d3select(this.svgEl).on('mousemove', this.onMouseMove.bind(this));
 
         this.next();
 
@@ -77,7 +79,6 @@ const App = defineComponent({
         let realMax = this.data.get('realMax');
 
         if (currentMax < realMax) {
-            // console.log(currentMax, realMax)
             this.data.set('currentMax', currentMax + 1);
             setTimeout(this.next.bind(this), 500);
         }
@@ -99,11 +100,12 @@ const App = defineComponent({
             .domain([0, this.svg.width / 2, this.svg.width])
             .range([.5, 0, -.5]);
 
-        // console.log('heightFactor', scaleFactor(y));
-        // console.log('lean', scaleLean(x));
+        // 两个因素会触发叶子变更 尝试合并
 
-        this.data.set('heightFactor', scaleFactor(y));
-        this.data.set('lean', scaleLean(x));
+        this.data.set('seed', {
+            heightFactor: scaleFactor(y),
+            lean: scaleLean(x)
+        });
 
     }),
 

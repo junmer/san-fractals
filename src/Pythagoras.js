@@ -40,10 +40,21 @@ const memoizedCalc = function () {
 
 var Pythagoras = defineComponent({
 
+    components: {
+        'pythagoras': 'self'
+    },
+
     initData: function() {
         return {
             left: 0,
-            right: 0
+            right: 0,
+            nextLeft: 0,
+            nextRight: 0,
+            w: 0,
+            x: 0,
+            y: 0,
+            lvl: 0,
+            maxlvl: 0
         };
     },
 
@@ -55,26 +66,26 @@ var Pythagoras = defineComponent({
                 style="{{ rectStyle }}" />
 
             <pythagoras
-                san-if="{{ hasNext }}"
+                san-if="{{ lvl < maxlvl && w > 2 }}"
                 w="{{ nextLeft }}"
                 x="{{ 0 }}"
                 y="{{ 0 - nextLeft }}"
                 lvl="{{ lvl + 1 }}"
                 maxlvl="{{ maxlvl }}"
-                heightFactor="{{ heightFactor }}"
-                lean="{{ lean }}"
-                left="{{ 1 }}" />
+                seed="{{ seed }}"
+                left="{{ 1 }}" >
+            </pythagoras>
 
             <pythagoras
-                san-if="{{ hasNext }}"
+                san-if="{{ lvl < maxlvl && w > 2 }}"
                 w="{{ nextRight }}"
                 x="{{ w - nextRight }}"
                 y="{{ 0 - nextRight }}"
                 lvl="{{ lvl + 1 }}"
                 maxlvl="{{ maxlvl }}"
-                heightFactor="{{ heightFactor }}"
-                lean="{{ lean }}"
-                right="{{ 1 }}" />
+                seed="{{ seed }}"
+                right="{{ 1 }}" >
+            </pythagoras>
 
         </g>
     `,
@@ -85,30 +96,23 @@ var Pythagoras = defineComponent({
             return 'fill:' + interpolateViridis(this.data.get('lvl') / this.data.get('maxlvl'));
         },
 
-        nextRight: function() {
+        calcNext: function() {
 
-            var ret = memoizedCalc({
+            let { heightFactor, lean } = this.data.get('seed');
+
+            return memoizedCalc({
                 w: this.data.get('w'),
-                heightFactor: this.data.get('heightFactor'),
-                lean: this.data.get('lean')
+                heightFactor: heightFactor,
+                lean: lean
             });
+        },
 
-            return ret.nextRight;
+        nextRight: function() {
+            return this.data.get('calcNext').nextRight;
         },
 
         nextLeft: function() {
-
-            var ret = memoizedCalc({
-                w: this.data.get('w'),
-                heightFactor: this.data.get('heightFactor'),
-                lean: this.data.get('lean')
-            });
-
-            return ret.nextLeft;
-        },
-
-        hasNext: function() {
-            return this.data.get('lvl') < this.data.get('maxlvl') && this.data.get('w') > 2;
+            return this.data.get('calcNext').nextLeft;
         },
 
         gTransform: function() {
@@ -116,14 +120,8 @@ var Pythagoras = defineComponent({
             let w = this.data.get('w');
             let x = this.data.get('x');
             let y = this.data.get('y');
-            let heightFactor = this.data.get('heightFactor');
-            let lean = this.data.get('lean');
 
-            const { nextRight, nextLeft, A, B } = memoizedCalc({
-                w: w,
-                heightFactor: heightFactor,
-                lean: lean
-            });
+            const { nextRight, nextLeft, A, B } = this.data.get('calcNext');
 
             let rotate = '';
 
@@ -134,22 +132,28 @@ var Pythagoras = defineComponent({
                 rotate = `rotate(${B} ${w} ${w})`;
             }
 
-            console.log(`translate(${x} ${y}) ${rotate}`)
-
             return `translate(${x} ${y}) ${rotate}`;
 
         }
     },
 
-    attached() {
-        console.log(this.data.data)
-    }
+
+    // inited() {
+    //     console.log('inited')
+    //     console.log(this.data.get('lvl'))
+    // },
+
+    // updated() {
+    //     console.log('updated',this.el.id)
+    //     console.log(this.data.get('lvl'))
+    // },
+
+    // attached() {
+    //     console.log('attached', this.el.id)
+    //     console.log(this.data.get('lvl'))
+    // }
 
 });
 
-// lift self
-Pythagoras.prototype.components = {
-    pythagoras: Pythagoras
-};
 
 export default Pythagoras;

@@ -40,10 +40,6 @@ const memoizedCalc = function () {
 
 var Pythagoras = defineComponent({
 
-    components: {
-        'pythagoras': 'self'
-    },
-
     initData: function() {
         return {
             left: 0,
@@ -58,12 +54,18 @@ var Pythagoras = defineComponent({
         };
     },
 
+    components: {
+        'pythagoras': 'self'
+    },
+
+
     template: `
         <g transform="{{ gTransform }}" >
             <rect
                 width="{{ w }}" height="{{ w }}"
                 x="0" y="0"
                 style="{{ rectStyle }}" />
+            </rect>
 
             <pythagoras
                 san-if="{{ lvl < maxlvl && w > 2 }}"
@@ -72,7 +74,8 @@ var Pythagoras = defineComponent({
                 y="{{ 0 - nextLeft }}"
                 lvl="{{ lvl + 1 }}"
                 maxlvl="{{ maxlvl }}"
-                seed="{{ seed }}"
+                heightFactor="{{ heightFactor }}"
+                lean="{{ lean }}"
                 left="{{ 1 }}" >
             </pythagoras>
 
@@ -83,7 +86,8 @@ var Pythagoras = defineComponent({
                 y="{{ 0 - nextRight }}"
                 lvl="{{ lvl + 1 }}"
                 maxlvl="{{ maxlvl }}"
-                seed="{{ seed }}"
+                heightFactor="{{ heightFactor }}"
+                lean="{{ lean }}"
                 right="{{ 1 }}" >
             </pythagoras>
 
@@ -97,13 +101,10 @@ var Pythagoras = defineComponent({
         },
 
         calcNext: function() {
-
-            let { heightFactor, lean } = this.data.get('seed');
-
             return memoizedCalc({
                 w: this.data.get('w'),
-                heightFactor: heightFactor,
-                lean: lean
+                heightFactor: this.data.get('heightFactor'),
+                lean: this.data.get('lean')
             });
         },
 
@@ -154,6 +155,7 @@ var Pythagoras = defineComponent({
     // }
 
 });
+
 
 
 export default Pythagoras;

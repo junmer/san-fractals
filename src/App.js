@@ -36,9 +36,10 @@ const App = defineComponent({
 
                     <pythagoras w="{{baseW}}"
                                 h="{{baseW}}"
-                                seed="{{seed}}"
                                 x="{{(svg.width - baseW) / 2}}"
                                 y="{{svg.height - baseW}}"
+                                heightFactor="{{heightFactor}}"
+                                lean="{{lean}}"
                                 lvl="{{0}}"
                                 maxlvl="{{currentMax}}" >
                     </pythagoras>
@@ -53,12 +54,10 @@ const App = defineComponent({
             logo: logo,
             svg: this.svg,
             realMax: 10,
-            currentMax: 1,
+            currentMax: 0,
             baseW: 80,
-            seed: {
-                heightFactor: 0,
-                lean: 0,
-            }
+            heightFactor: 0,
+            lean: 0,
         }
     },
 
@@ -92,20 +91,16 @@ const App = defineComponent({
 
     update: throttleWithRAF(function(x, y) {
 
-        let scaleFactor = scaleLinear()
+        const scaleFactor = scaleLinear()
             .domain([this.svg.height, 0])
             .range([0, .8]);
 
-        let scaleLean = scaleLinear()
+        const scaleLean = scaleLinear()
             .domain([0, this.svg.width / 2, this.svg.width])
             .range([.5, 0, -.5]);
 
-        // 两个因素会触发叶子变更 尝试合并
-
-        this.data.set('seed', {
-            heightFactor: scaleFactor(y),
-            lean: scaleLean(x)
-        });
+        this.data.set('heightFactor', scaleFactor(y));
+        this.data.set('lean', scaleLean(x));
 
     }),
 

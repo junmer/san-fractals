@@ -41,9 +41,7 @@ const App = defineComponent({
                                 heightFactor="{{heightFactor}}"
                                 lean="{{lean}}"
                                 lvl="{{0}}"
-                                maxlvl="{{currentMax}}" >
-                    </pythagoras>
-
+                                maxlvl="{{currentMax}}" />
                 </svg>
             </p>
         </div>

@@ -58,14 +58,12 @@ var Pythagoras = defineComponent({
         'pythagoras': 'self'
     },
 
-
     template: `
         <g transform="{{ gTransform }}" >
             <rect
                 width="{{ w }}" height="{{ w }}"
                 x="0" y="0"
                 style="{{ rectStyle }}" />
-            </rect>
 
             <pythagoras
                 san-if="{{ lvl < maxlvl && w > 2 }}"
@@ -76,8 +74,7 @@ var Pythagoras = defineComponent({
                 maxlvl="{{ maxlvl }}"
                 heightFactor="{{ heightFactor }}"
                 lean="{{ lean }}"
-                left="{{ 1 }}" >
-            </pythagoras>
+                left="{{ 1 }}" />
 
             <pythagoras
                 san-if="{{ lvl < maxlvl && w > 2 }}"
@@ -88,8 +85,7 @@ var Pythagoras = defineComponent({
                 maxlvl="{{ maxlvl }}"
                 heightFactor="{{ heightFactor }}"
                 lean="{{ lean }}"
-                right="{{ 1 }}" >
-            </pythagoras>
+                right="{{ 1 }}" />
 
         </g>
     `,
@@ -136,23 +132,7 @@ var Pythagoras = defineComponent({
             return `translate(${x} ${y}) ${rotate}`;
 
         }
-    },
-
-
-    // inited() {
-    //     console.log('inited')
-    //     console.log(this.data.get('lvl'))
-    // },
-
-    // updated() {
-    //     console.log('updated',this.el.id)
-    //     console.log(this.data.get('lvl'))
-    // },
-
-    // attached() {
-    //     console.log('attached', this.el.id)
-    //     console.log(this.data.get('lvl'))
-    // }
+    }
 
 });
 

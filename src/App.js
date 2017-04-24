@@ -87,7 +87,11 @@ const App = defineComponent({
         height: 600
     },
 
-    update: throttleWithRAF(function(x, y) {
+    update: function(x, y) {
+
+        if (this.running) return;
+
+        this.running = true;
 
         const scaleFactor = scaleLinear()
             .domain([this.svg.height, 0])
@@ -100,7 +104,9 @@ const App = defineComponent({
         this.data.set('heightFactor', scaleFactor(y));
         this.data.set('lean', scaleLean(x));
 
-    }),
+        this.running = false;
+
+    },
 
     onMouseMove(event) {
 

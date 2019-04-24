@@ -59,17 +59,17 @@ var Pythagoras = defineComponent({
     },
 
     template: `
-        <g transform="{{ gTransform }}" >
+        <g transform="translate({{x}} {{y}}) {{ gRotate(left,right,calcNext,w) }}" >
             <rect
                 width="{{ w }}" height="{{ w }}"
                 x="0" y="0"
-                style="{{ rectStyle }}" />
+                style="fill: {{ lvl | styleFill(maxlvl) }}" />
 
             <pythagoras
                 san-if="{{ lvl < maxlvl && w > 2 }}"
-                w="{{ nextLeft }}"
+                w="{{ calcNext.nextLeft }}"
                 x="{{ 0 }}"
-                y="{{ 0 - nextLeft }}"
+                y="{{ 0 - calcNext.nextLeft }}"
                 lvl="{{ lvl + 1 }}"
                 maxlvl="{{ maxlvl }}"
                 heightFactor="{{ heightFactor }}"
@@ -78,9 +78,9 @@ var Pythagoras = defineComponent({
 
             <pythagoras
                 san-if="{{ lvl < maxlvl && w > 2 }}"
-                w="{{ nextRight }}"
-                x="{{ w - nextRight }}"
-                y="{{ 0 - nextRight }}"
+                w="{{ calcNext.nextRight }}"
+                x="{{ w - calcNext.nextRight }}"
+                y="{{ 0 - calcNext.nextRight }}"
                 lvl="{{ lvl + 1 }}"
                 maxlvl="{{ maxlvl }}"
                 heightFactor="{{ heightFactor }}"
@@ -90,11 +90,26 @@ var Pythagoras = defineComponent({
         </g>
     `,
 
-    computed: {
+    filters: {
+        styleFill: function (a, b) {
+            return interpolateViridis(a / b)
+        }
+    },
 
-        rectStyle: function() {
-            return 'fill:' + interpolateViridis(this.data.get('lvl') / this.data.get('maxlvl'));
-        },
+    gRotate: function (left, right, calcNext, w) {
+        const { nextRight, nextLeft, A, B } = calcNext;
+
+        if (left) {
+            return `rotate(${-A} 0 ${w})`;
+        }
+        
+        if (right) {
+            return `rotate(${B} ${w} ${w})`;
+        }
+        return ''
+    },
+
+    computed: {
 
         calcNext: function() {
             return memoizedCalc({
@@ -102,35 +117,6 @@ var Pythagoras = defineComponent({
                 heightFactor: this.data.get('heightFactor'),
                 lean: this.data.get('lean')
             });
-        },
-
-        nextRight: function() {
-            return this.data.get('calcNext').nextRight;
-        },
-
-        nextLeft: function() {
-            return this.data.get('calcNext').nextLeft;
-        },
-
-        gTransform: function() {
-
-            let w = this.data.get('w');
-            let x = this.data.get('x');
-            let y = this.data.get('y');
-
-            const { nextRight, nextLeft, A, B } = this.data.get('calcNext');
-
-            let rotate = '';
-
-            if (this.data.get('left')) {
-                rotate = `rotate(${-A} 0 ${w})`;
-            }
-            else if (this.data.get('right')) {
-                rotate = `rotate(${B} ${w} ${w})`;
-            }
-
-            return `translate(${x} ${y}) ${rotate}`;
-
         }
     }
 
